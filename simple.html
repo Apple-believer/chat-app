@@ -1,0 +1,200 @@
+</html>
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8">
+    <title>Chat App</title>
+    <style>
+        #output {
+            height: 80vh;
+            background: #8DB4E5;
+            overflow: scroll;
+            width: 60%;
+            margin: 30px auto;
+        }
+
+        .msg:nth-child(odd) {
+            width: 40%;
+            background: white;
+            box-sizing: 10px;
+
+            padding: 10px;
+            margin: 10 auto;
+            box: sizing 100px;
+
+
+        }
+
+        .msg:nth-child(even) {
+            background: white;
+            width: 40%;
+            padding: 10px;
+
+            margin: 0 auto;
+        }
+
+        .text {
+            height: 10vh;
+            display: flex;
+        }
+
+        section {
+            width: 60%;
+            margin: 0 auto;
+        }
+
+        .text {
+            width: 100%;
+            height: 100%;
+            resize: none;
+            /* これでユーザーのリサイズをできなくする */
+            border: 1px solid #ddd;
+            /* 枠線をつけて領域を分かりやすく */
+            box-sizing: border-box;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- コンテンツ表示画面 -->
+    <div id="output"><div id="date"></div></div>
+    <section>
+
+        <!-- <div> 名前：<input type="text" id="uname"> </div> -->
+        <textarea id="text" style="width: 100%;
+            height: 10%;
+            resize: none; 
+            border: 1px solid #ddd; 
+            box-sizing: border-box; "></textarea>
+        <button id="send" style="width: 100%;
+            height: 10%;
+            background: #61E739;
+            color: #fff;
+            font-size: 2.0rem;
+            font-weight: bold;
+            border: 0;">送信</button>
+    </section>
+    <!--/ コンテンツ表示画面 -->
+
+
+
+    <!-- JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- JQuery -->
+
+    <!--** 以下Firebase **-->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js";
+
+        // 貼り付ける場所
+        import { getDatabase, ref, push, set, onChildAdded, remove, onChildRemoved } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-database.js";
+        // 
+
+
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "",
+            authDomain: "",
+            projectId: "",
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: ""
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+
+
+
+
+        const db = getDatabase(app);
+        const dbRef = ref(db, 'dev245');
+
+        // 送信処理を記述
+        $('#send').on('click', function () {
+
+            var nowTime = $.now();
+	$("body").append("<br/>" + nowTime);
+            const text = $('#text').val();
+            const messageText = $('#text').val()
+            // チャットエリアの要素を取得
+            const chatArea = $('.chat-area')
+
+            // メッセージを表示するdiv要素
+            const messageContainer = $('<div></div>')
+
+            // チャットメッセージ用の装飾をしたクラスを当てたpタグを追加
+            const message = $('<p></p>').addClass('chat-message').text(messageText)
+
+
+            chatArea.append(messageContainer)
+
+
+            const msg = {
+
+                text: text,
+            }
+
+
+            const newPostRef = push(dbRef) //データを送信できる準備
+            set(newPostRef, msg); // firebaseの登録できる場所に保存するイメージです🤗
+
+
+            $('#text').val("");
+
+
+        });
+
+
+        $("#text").on('keydown', function (e) {
+            console.log(e, 'イベントのデータの塊')
+            console.log(e.keyCode, 'イベントのデータの塊')
+
+        });
+
+        // 受信処理を記述
+        onChildAdded(dbRef, function (data) {
+
+            const msg = data.val();
+            console.log(msg, '取得したデータの塊')
+            const key = data.key;
+            console.log(key, 'データの塊にアクセス')
+
+
+
+            let h = `
+                <div class="msg">
+                    <p>${msg.text}</p>
+                </div>    
+            `;
+
+            $("#output").append(h);
+            const output = document.getElementById('output');
+            output.scrollTo(0, output.scrollHeight);
+        })
+
+
+
+
+
+    </script>
+
+
+
+
+
+
+
+
+
+
+</body>
+
+</html>
